@@ -46,7 +46,7 @@ export class Group {
     const graph: CayleyGraph = [[this.id, []]];
     const visited: GroupElement[] = [this.id];
     const stack: number[] = [0];
-    
+
     while (stack.length > 0) {
       const nidx = stack.pop()!;
       const [e, cs] = graph[nidx]!;
