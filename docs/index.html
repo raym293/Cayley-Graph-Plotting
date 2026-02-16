@@ -266,7 +266,7 @@ function ui_init(group_listing, matrep) {
     // Initialize params for all elements, and select all as generators by default
     new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
-        UIPARAMS[`genSelect #${idx}`] = true; // Make all elements available as generator options
+        UIPARAMS[`genSelect #${idx}`] = true; // Select all elements as generators by default
         UIPARAMS[`linkVisibility #${idx}`] = true;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
