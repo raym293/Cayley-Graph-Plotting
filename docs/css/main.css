@@ -275,3 +275,31 @@ body {
 #ui-control, #ui-control *{
     font-size: 0.96em;
 }
+
+/* Enable scrolling for dat.GUI folders with many items */
+.dg .cr.function,
+.dg .cr.number, 
+.dg .cr.boolean {
+    border-left: 3px solid;
+}
+
+.dg ul {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Ensure the scrollbar is visible and styled */
+.dg ul::-webkit-scrollbar {
+    width: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.dg ul::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+.dg ul::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+}
