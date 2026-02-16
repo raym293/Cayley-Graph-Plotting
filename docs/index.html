@@ -89,14 +89,17 @@ function init_plot() {
   return [plt, scene];
 }
 
-function plot_group(plt, G) {
+function plot_group(plt, G, selectedGens) {
+  const genIndices = selectedGens || G.gens.map((_, idx) => idx);
+  const cayleyGraph = G.cayleyWithGenerators(genIndices);
+  
   const graph_data = {
-    nodes: G.cayley.map((_, idx) => ({id: idx})),
-    links: G.cayley.map((n, idx) => n[1].map((m, jdx) => (
+    nodes: cayleyGraph.map((_, idx) => ({id: idx})),
+    links: cayleyGraph.map((n, idx) => n[1].map((m, jdx) => (
       {
         source: idx,
         target: m,
-        group: jdx
+        group: genIndices[jdx]  // Map to actual generator index
       }
     ))).reduce((a,b) => a.concat(b))
   };
@@ -195,6 +198,8 @@ function ui_init(group_listing, matrep) {
   const gui = new dat.GUI({autoPlace: false});
   PLOT.appendChild(gui.domElement);
   gui.domElement.id = "ui-control";
+  const genSelect = gui.addFolder('generatorSelection');
+  genSelect.open();
   const linkVis = gui.addFolder('linkVisibility');
   linkVis.close();
   const linkArrows = gui.addFolder('linkArrows');
@@ -208,9 +213,23 @@ function ui_init(group_listing, matrep) {
     ACTIVEGID = gid;
     const [gmat, fp] = matrep[gid];
     const G = create_group(gmat, fp);
+    
+    // Function to regenerate plot with selected generators
+    const regeneratePlot = () => {
+      const selectedGens = [];
+      for (let i = 0; i < G.gens.length; i++) {
+        if (UIPARAMS[`genSelect #${i}`]) {
+          selectedGens.push(i);
+        }
+      }
+      plot_group(plt, G, selectedGens);
+    };
+    
     plot_group(plt, G);
     highlight_activegid();
 
+    while (genSelect.__controllers.length > 0)
+      genSelect.__controllers[0].remove();
     while (linkVis.__controllers.length > 0)
       linkVis.__controllers[0].remove();
     while (linkArrows.__controllers.length > 0)
@@ -220,6 +239,7 @@ function ui_init(group_listing, matrep) {
 
     new Array(G.gens.length).fill(true)
       .forEach((v, idx) => {
+        UIPARAMS[`genSelect #${idx}`] = v;
         UIPARAMS[`linkVisibility #${idx}`] = v;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
@@ -228,6 +248,11 @@ function ui_init(group_listing, matrep) {
 
     new Array(G.gens.length).fill(1).forEach(
       (_, idx) => {
+
+        genSelect
+          .add(UIPARAMS, `genSelect #${idx}`)
+          .name(`Generator ${idx}`)
+          .onChange(regeneratePlot);
 
         linkVis
           .add(UIPARAMS, `linkVisibility #${idx}`, true)
