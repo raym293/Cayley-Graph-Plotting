@@ -39,7 +39,9 @@ export class Group {
   }
 
   cayleyWithGenerators(genIndices: number[]): CayleyGraph {
-    const selectedGens = genIndices.map(idx => this.gens[idx]!);
+    const selectedGens = genIndices
+      .filter(idx => idx >= 0 && idx < this.gens.length)
+      .map(idx => this.gens[idx]!);
     return this.cayleyWithElements(selectedGens);
   }
 

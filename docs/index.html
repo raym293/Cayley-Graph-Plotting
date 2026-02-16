@@ -93,7 +93,7 @@ function plot_group(plt, G, selectedElements) {
   // If selectedElements are GroupElement objects, use them directly
   // Otherwise assume they are indices into G.gens (backward compatibility)
   let generators;
-  if (selectedElements && selectedElements.length > 0 && selectedElements[0].mat) {
+  if (selectedElements && selectedElements.length > 0 && selectedElements[0] && selectedElements[0].mat) {
     // These are GroupElement objects
     generators = selectedElements;
   } else {
@@ -125,7 +125,9 @@ function plot_group(plt, G, selectedElements) {
     .linkDirectionalArrowLength(d => {
       const genIdx = d.group;
       const g = allElements[genIdx];
-      return g && g.mul(g).mat.equal(G.id.mat)
+      if (!g) return 15;
+      const gSquared = g.mul(g);
+      return gSquared.mat.equal(G.id.mat)
         ? 0
         : 15
     })
@@ -296,7 +298,8 @@ function ui_init(group_listing, matrep) {
           .setValue(30);
 
         const g = element;
-        if (!g.mul(g).mat.equal(G.id.mat)) {
+        const gSquared = g.mul(g);
+        if (!gSquared.mat.equal(G.id.mat)) {
           linkArrows
             .add(UIPARAMS, `linkArrows #${idx}`, 0, 30, 0.01)
             .onChange(() =>

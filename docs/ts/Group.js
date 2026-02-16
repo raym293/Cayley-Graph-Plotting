@@ -20,7 +20,9 @@ export class Group {
         return this.cayleyWithGenerators(this.gens.map((_, idx) => idx));
     }
     cayleyWithGenerators(genIndices) {
-        const selectedGens = genIndices.map(idx => this.gens[idx]);
+        const selectedGens = genIndices
+            .filter(idx => idx >= 0 && idx < this.gens.length)
+            .map(idx => this.gens[idx]);
         return this.cayleyWithElements(selectedGens);
     }
     cayleyWithElements(generators) {
