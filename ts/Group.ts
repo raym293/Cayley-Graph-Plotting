@@ -75,6 +75,38 @@ export class Group {
     const cayley = this.cayley;
     return cayley.map(([element]) => element);
   }
+
+  // Generate Cayley graph using specific GroupElement objects as generators
+  cayleyWithElements(generators: GroupElement[]): CayleyGraph {
+    if (generators.length === 0) {
+      return [[this.id, []]];
+    }
+
+    const graph: CayleyGraph = [[this.id, []]];
+    const visited: GroupElement[] = [this.id];
+    const stack: number[] = [0];
+
+    while (stack.length > 0) {
+      const nidx = stack.pop()!;
+      const [e, cs] = graph[nidx]!;
+
+      // Iterate through selected generators
+      generators.forEach((g) => {
+        // left multiplication
+        const h = g.mul(e);
+        const idx = visited.indexOf(h);
+        if (idx == -1) {
+          cs.push(graph.length);
+          stack.push(graph.length);
+          visited.push(h);
+          graph.push([h, []]);
+          return;
+        }
+        cs.push(idx);
+      });
+    }
+    return graph;
+  }
 }
 
 export class GroupElement {
