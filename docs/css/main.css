@@ -277,19 +277,16 @@ body {
 }
 
 /* Enable scrolling for dat.GUI folders with many items */
-.dg .cr.function,
-.dg .cr.number, 
-.dg .cr.boolean {
-    border-left: 3px solid;
-}
-
 .dg ul {
     max-height: 400px;
     overflow-y: auto;
     overflow-x: hidden;
+    /* Firefox scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.3);
 }
 
-/* Ensure the scrollbar is visible and styled */
+/* Webkit browsers scrollbar styling */
 .dg ul::-webkit-scrollbar {
     width: 8px;
     background-color: rgba(0, 0, 0, 0.3);
