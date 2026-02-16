@@ -263,10 +263,10 @@ function ui_init(group_listing, matrep) {
     while (linkForce.__controllers.length > 0)
       linkForce.__controllers[0].remove();
 
-    // Initialize params for all elements, but only select standard generators by default
+    // Initialize params for all elements, and select all as generators by default
     new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
-        UIPARAMS[`genSelect #${idx}`] = idx < G.gens.length; // Default to true for standard generators
+        UIPARAMS[`genSelect #${idx}`] = true; // Select all elements as generators by default
         UIPARAMS[`linkVisibility #${idx}`] = true;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
@@ -315,7 +315,10 @@ function ui_init(group_listing, matrep) {
       }
     );
     linkArrows.add(UIPARAMS, `arrowPos`, 0, 1, 0.01)
-      .onChange(() => plt.linkDirectionalArrowRelPos(UIPARAMS[`arrowPos`]))
+      .onChange(() => plt.linkDirectionalArrowRelPos(UIPARAMS[`arrowPos`]));
+    
+    // Regenerate plot to reflect all selected elements
+    regeneratePlot();
   }
 
   const create_group_listing = () => {
