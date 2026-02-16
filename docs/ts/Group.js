@@ -20,7 +20,11 @@ export class Group {
         return this.cayleyWithGenerators(this.gens.map((_, idx) => idx));
     }
     cayleyWithGenerators(genIndices) {
-        if (genIndices.length === 0) {
+        const selectedGens = genIndices.map(idx => this.gens[idx]);
+        return this.cayleyWithElements(selectedGens);
+    }
+    cayleyWithElements(generators) {
+        if (generators.length === 0) {
             return [[this.id, []]];
         }
         const graph = [[this.id, []]];
@@ -29,9 +33,8 @@ export class Group {
         while (stack.length > 0) {
             const nidx = stack.pop();
             const [e, cs] = graph[nidx];
-            // Only iterate through selected generators
-            genIndices.forEach((genIdx) => {
-                const g = this.gens[genIdx];
+            // Iterate through provided generators
+            generators.forEach((g) => {
                 // left multiplication
                 const h = g.mul(e);
                 const idx = visited.indexOf(h);
@@ -46,6 +49,11 @@ export class Group {
             });
         }
         return graph;
+    }
+    // Get all elements by generating the full cayley graph first
+    getAllElements() {
+        const cayley = this.cayley;
+        return cayley.map(([element]) => element);
     }
 }
 export class GroupElement {

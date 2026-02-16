@@ -89,9 +89,26 @@ function init_plot() {
   return [plt, scene];
 }
 
-function plot_group(plt, G, selectedGens) {
-  const genIndices = selectedGens || G.gens.map((_, idx) => idx);
-  const cayleyGraph = G.cayleyWithGenerators(genIndices);
+function plot_group(plt, G, selectedElements) {
+  // If selectedElements are GroupElement objects, use them directly
+  // Otherwise assume they are indices into G.gens (backward compatibility)
+  let generators;
+  if (selectedElements && selectedElements.length > 0 && selectedElements[0].mat) {
+    // These are GroupElement objects
+    generators = selectedElements;
+  } else {
+    // These are indices into G.gens
+    const genIndices = selectedElements || G.gens.map((_, idx) => idx);
+    generators = genIndices.map(idx => G.gens[idx]);
+  }
+  
+  const cayleyGraph = G.cayleyWithElements(generators);
+  
+  // For coloring, we need to map generators back to their indices in the element list
+  const allElements = G.getAllElements();
+  const generatorIndices = generators.map(gen => 
+    allElements.findIndex(elem => elem.mat.equal(gen.mat))
+  );
   
   const graph_data = {
     nodes: cayleyGraph.map((_, idx) => ({id: idx})),
@@ -99,15 +116,16 @@ function plot_group(plt, G, selectedGens) {
       {
         source: idx,
         target: m,
-        group: genIndices[jdx]  // Map to actual generator index
+        group: generatorIndices[jdx]  // Use element index for coloring
       }
     ))).reduce((a,b) => a.concat(b))
   };
 
   plt  
     .linkDirectionalArrowLength(d => {
-      const g = G.gens[d.group];
-      return g.mul(g) == G.id
+      const genIdx = d.group;
+      const g = allElements[genIdx];
+      return g && g.mul(g).mat.equal(G.id.mat)
         ? 0
         : 15
     })
@@ -214,15 +232,18 @@ function ui_init(group_listing, matrep) {
     const [gmat, fp] = matrep[gid];
     const G = create_group(gmat, fp);
     
-    // Function to regenerate plot with selected generators
+    // Get all group elements
+    const allElements = G.getAllElements();
+    
+    // Function to regenerate plot with selected elements
     const regeneratePlot = () => {
-      const selectedGens = [];
-      for (let i = 0; i < G.gens.length; i++) {
+      const selectedElements = [];
+      for (let i = 0; i < allElements.length; i++) {
         if (UIPARAMS[`genSelect #${i}`]) {
-          selectedGens.push(i);
+          selectedElements.push(allElements[i]);
         }
       }
-      plot_group(plt, G, selectedGens);
+      plot_group(plt, G, selectedElements.length > 0 ? selectedElements : G.gens);
     };
     
     plot_group(plt, G);
@@ -237,21 +258,27 @@ function ui_init(group_listing, matrep) {
     while (linkForce.__controllers.length > 0)
       linkForce.__controllers[0].remove();
 
-    new Array(G.gens.length).fill(true)
+    // Initialize params for all elements, but only select standard generators by default
+    new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
-        UIPARAMS[`genSelect #${idx}`] = v;
-        UIPARAMS[`linkVisibility #${idx}`] = v;
+        // Select standard generators by default
+        UIPARAMS[`genSelect #${idx}`] = idx < G.gens.length;
+        UIPARAMS[`linkVisibility #${idx}`] = true;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
       });
     UIPARAMS[`arrowPos`] = 0.5;
 
-    new Array(G.gens.length).fill(1).forEach(
+    // Add controls for all elements
+    new Array(allElements.length).fill(1).forEach(
       (_, idx) => {
+        const element = allElements[idx];
+        const isStdGen = idx < G.gens.length;
+        const label = isStdGen ? `Gen ${idx} (std)` : `Element ${idx}`;
 
         genSelect
           .add(UIPARAMS, `genSelect #${idx}`)
-          .name(`Generator ${idx}`)
+          .name(label)
           .onChange(regeneratePlot);
 
         linkVis
@@ -268,8 +295,8 @@ function ui_init(group_listing, matrep) {
           })
           .setValue(30);
 
-        const g = G.gens[idx];
-        if (g.mul(g) != G.id) {
+        const g = element;
+        if (!g.mul(g).mat.equal(G.id.mat)) {
           linkArrows
             .add(UIPARAMS, `linkArrows #${idx}`, 0, 30, 0.01)
             .onChange(() =>
