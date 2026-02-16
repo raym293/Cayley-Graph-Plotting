@@ -169,32 +169,32 @@
                 </p>
                 <div class="element-grid">
                     <div class="element-item standard" onclick="toggleCheck(0)">
-                        <input type="checkbox" id="e0" checked onchange="updateDemo()">
-                        <label for="e0">Gen 0 (std)</label>
+                        <input type="checkbox" id="e0" onchange="updateDemo()">
+                        <label for="e0">e (identity)</label>
                     </div>
                     <div class="element-item standard" onclick="toggleCheck(1)">
                         <input type="checkbox" id="e1" checked onchange="updateDemo()">
-                        <label for="e1">Gen 1 (std)</label>
+                        <label for="e1">g0</label>
                     </div>
                     <div class="element-item" onclick="toggleCheck(2)">
                         <input type="checkbox" id="e2" onchange="updateDemo()">
-                        <label for="e2">Element 2</label>
+                        <label for="e2">elem 2</label>
                     </div>
                     <div class="element-item" onclick="toggleCheck(3)">
                         <input type="checkbox" id="e3" onchange="updateDemo()">
-                        <label for="e3">Element 3</label>
+                        <label for="e3">elem 3</label>
                     </div>
                     <div class="element-item" onclick="toggleCheck(4)">
                         <input type="checkbox" id="e4" onchange="updateDemo()">
-                        <label for="e4">Element 4</label>
+                        <label for="e4">elem 4</label>
                     </div>
                     <div class="element-item" onclick="toggleCheck(5)">
                         <input type="checkbox" id="e5" onchange="updateDemo()">
-                        <label for="e5">Element 5</label>
+                        <label for="e5">elem 5</label>
                     </div>
                 </div>
                 <div class="info-block success" style="margin-top: 20px;">
-                    <strong>Selected:</strong> <span id="selected">Gen 0, Gen 1</span><br>
+                    <strong>Selected:</strong> <span id="selected">g0</span><br>
                     <strong>Graph:</strong> <span id="result">Standard Cayley graph (default)</span>
                 </div>
             </div>
@@ -281,8 +281,8 @@
 
         function updateDemo() {
             const labels = [
-                'Gen 0 (std)', 'Gen 1 (std)', 'Element 2', 
-                'Element 3', 'Element 4', 'Element 5'
+                'e (identity)', 'g0', 'elem 2', 
+                'elem 3', 'elem 4', 'elem 5'
             ];
             
             const selected = [];
@@ -298,9 +298,9 @@
             let result = '';
             if (selected.length === 0) {
                 result = 'No generators selected (only identity element)';
-            } else if (selected.length === 2 && selected.includes('Gen 0 (std)') && selected.includes('Gen 1 (std)')) {
+            } else if (selected.length === 1 && selected.includes('g0')) {
                 result = 'Standard Cayley graph (default)';
-            } else if (selected.some(s => !s.includes('std'))) {
+            } else if (selected.some(s => s.startsWith('elem'))) {
                 result = 'Custom Cayley graph using non-standard elements!';
             } else {
                 result = 'Custom Cayley graph using subset of standard generators';

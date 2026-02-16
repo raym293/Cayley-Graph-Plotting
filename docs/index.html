@@ -267,7 +267,8 @@ function ui_init(group_listing, matrep) {
     new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
         const isStdGen = idx < G.gens.length;
-        UIPARAMS[`genSelect #${idx}`] = isStdGen; // Select only standard generators by default
+        // Identity (index 0) should be unchecked by default, others selected
+        UIPARAMS[`genSelect #${idx}`] = isStdGen && idx !== 0;
         UIPARAMS[`linkVisibility #${idx}`] = true;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
@@ -279,7 +280,19 @@ function ui_init(group_listing, matrep) {
       (_, idx) => {
         const element = allElements[idx];
         const isStdGen = idx < G.gens.length;
-        const label = isStdGen ? `Gen ${idx} (std)` : `Element ${idx}`;
+        
+        // Create better labels
+        let label;
+        if (idx === 0) {
+          label = 'e (identity)';
+        } else if (isStdGen) {
+          label = `g${idx - 1}`;
+        } else {
+          // For non-standard elements, check if it's an involution (g² = e)
+          const gSquared = element.mul(element);
+          const isInvolution = gSquared.mat.equal(G.id.mat);
+          label = isInvolution ? `elem ${idx} (involution)` : `elem ${idx}`;
+        }
 
         genSelect
           .add(UIPARAMS, `genSelect #${idx}`)

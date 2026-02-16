@@ -170,20 +170,20 @@
                 </p>
                 <div class="checkbox-demo">
                     <div class="checkbox-item">
-                        <input type="checkbox" id="gen0" checked onchange="updateGraphDemo()">
-                        <label for="gen0">Generator 0</label>
+                        <input type="checkbox" id="gen0" onchange="updateGraphDemo()">
+                        <label for="gen0">e (identity)</label>
                     </div>
                     <div class="checkbox-item">
                         <input type="checkbox" id="gen1" checked onchange="updateGraphDemo()">
-                        <label for="gen1">Generator 1</label>
+                        <label for="gen1">g0</label>
                     </div>
                     <div class="checkbox-item">
                         <input type="checkbox" id="gen2" checked onchange="updateGraphDemo()">
-                        <label for="gen2">Generator 2</label>
+                        <label for="gen2">g1</label>
                     </div>
                 </div>
                 <div class="info-block success" style="margin-top: 20px;">
-                    <strong>Selected Generators:</strong> <span id="selected-gens">0, 1, 2</span><br>
+                    <strong>Selected Generators:</strong> <span id="selected-gens">g0, g1</span><br>
                     <strong>Result:</strong> <span id="result-text">Full graph with all generators</span>
                 </div>
             </div>
@@ -263,9 +263,9 @@
             const gen2 = document.getElementById('gen2').checked;
             
             const selected = [];
-            if (gen0) selected.push('0');
-            if (gen1) selected.push('1');
-            if (gen2) selected.push('2');
+            if (gen0) selected.push('e');
+            if (gen1) selected.push('g0');
+            if (gen2) selected.push('g1');
             
             const selectedText = selected.length > 0 ? selected.join(', ') : 'None';
             document.getElementById('selected-gens').textContent = selectedText;
