@@ -263,10 +263,10 @@ function ui_init(group_listing, matrep) {
     while (linkForce.__controllers.length > 0)
       linkForce.__controllers[0].remove();
 
-    // Initialize params for all elements, but only select standard generators by default
+    // Initialize params for all elements, and select all as generators by default
     new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
-        UIPARAMS[`genSelect #${idx}`] = idx < G.gens.length; // Default to true for standard generators
+        UIPARAMS[`genSelect #${idx}`] = true; // Make all elements available as generator options
         UIPARAMS[`linkVisibility #${idx}`] = true;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
