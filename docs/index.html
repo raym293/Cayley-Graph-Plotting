@@ -89,26 +89,9 @@ function init_plot() {
   return [plt, scene];
 }
 
-function plot_group(plt, G, selectedElements) {
-  // If selectedElements are GroupElement objects, use them directly
-  // Otherwise assume they are indices into G.gens (backward compatibility)
-  let generators;
-  if (selectedElements && selectedElements.length > 0 && selectedElements[0] && selectedElements[0].mat) {
-    // These are GroupElement objects
-    generators = selectedElements;
-  } else {
-    // These are indices into G.gens
-    const genIndices = selectedElements || G.gens.map((_, idx) => idx);
-    generators = genIndices.map(idx => G.gens[idx]);
-  }
-  
-  const cayleyGraph = G.cayleyWithElements(generators);
-  
-  // For coloring, we need to map generators back to their indices in the element list
-  const allElements = G.getAllElements();
-  const generatorIndices = generators.map(gen => 
-    allElements.findIndex(elem => elem.mat.equal(gen.mat))
-  );
+function plot_group(plt, G, selectedGens) {
+  const genIndices = selectedGens || G.gens.map((_, idx) => idx);
+  const cayleyGraph = G.cayleyWithGenerators(genIndices);
   
   const graph_data = {
     nodes: cayleyGraph.map((_, idx) => ({id: idx})),
@@ -116,7 +99,7 @@ function plot_group(plt, G, selectedElements) {
       {
         source: idx,
         target: m,
-        group: generatorIndices[jdx]  // Use element index for coloring
+        group: genIndices[jdx]  // Map to actual generator index
       }
     ))).reduce((a,b) => a.concat(b))
   };
@@ -234,18 +217,15 @@ function ui_init(group_listing, matrep) {
     const [gmat, fp] = matrep[gid];
     const G = create_group(gmat, fp);
     
-    // Get all group elements
-    const allElements = G.getAllElements();
-    
-    // Function to regenerate plot with selected elements
+    // Function to regenerate plot with selected generators
     const regeneratePlot = () => {
-      const selectedElements = [];
-      for (let i = 0; i < allElements.length; i++) {
+      const selectedGens = [];
+      for (let i = 0; i < G.gens.length; i++) {
         if (UIPARAMS[`genSelect #${i}`]) {
-          selectedElements.push(allElements[i]);
+          selectedGens.push(i);
         }
       }
-      plot_group(plt, G, selectedElements.length > 0 ? selectedElements : G.gens);
+      plot_group(plt, G, selectedGens);
     };
     
     plot_group(plt, G);
@@ -263,9 +243,8 @@ function ui_init(group_listing, matrep) {
     // Initialize params for all elements, but only select standard generators by default
     new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
-        // Select standard generators by default
-        UIPARAMS[`genSelect #${idx}`] = idx < G.gens.length;
-        UIPARAMS[`linkVisibility #${idx}`] = true;
+        UIPARAMS[`genSelect #${idx}`] = v;
+        UIPARAMS[`linkVisibility #${idx}`] = v;
         UIPARAMS[`linkArrows #${idx}`] = 0;
         UIPARAMS[`linkForce #${idx}`] = 30;
       });
@@ -281,6 +260,11 @@ function ui_init(group_listing, matrep) {
         genSelect
           .add(UIPARAMS, `genSelect #${idx}`)
           .name(label)
+          .onChange(regeneratePlot);
+
+        genSelect
+          .add(UIPARAMS, `genSelect #${idx}`)
+          .name(`Generator ${idx}`)
           .onChange(regeneratePlot);
 
         linkVis

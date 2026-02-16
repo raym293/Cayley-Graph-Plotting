@@ -39,14 +39,7 @@ export class Group {
   }
 
   cayleyWithGenerators(genIndices: number[]): CayleyGraph {
-    const selectedGens = genIndices
-      .filter(idx => idx >= 0 && idx < this.gens.length)
-      .map(idx => this.gens[idx]!);
-    return this.cayleyWithElements(selectedGens);
-  }
-
-  cayleyWithElements(generators: GroupElement[]): CayleyGraph {
-    if (generators.length === 0) {
+    if (genIndices.length === 0) {
       return [[this.id, []]];
     }
 
@@ -58,8 +51,9 @@ export class Group {
       const nidx = stack.pop()!;
       const [e, cs] = graph[nidx]!;
 
-      // Iterate through provided generators
-      generators.forEach((g) => {
+      // Only iterate through selected generators
+      genIndices.forEach((genIdx) => {
+        const g = this.gens[genIdx]!;
         // left multiplication
         const h = g.mul(e);
         const idx = visited.indexOf(h);
