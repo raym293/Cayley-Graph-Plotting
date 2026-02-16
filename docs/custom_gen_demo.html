@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Generator Selection - Demo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #030238 0%, #072a5f 100%);
+            color: #eee;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #01fdc7;
+            text-shadow: 0 0 10px rgba(1, 253, 199, 0.5);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .section {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(1, 253, 199, 0.2);
+        }
+        h2 {
+            color: #f765fc;
+            text-shadow: 0 0 8px rgba(247, 101, 252, 0.5);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #00d2f7;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .feature-list li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            line-height: 1.6;
+        }
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .demo-box {
+            background: rgba(3, 2, 56, 0.6);
+            border: 2px solid #01fdc7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .element-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .element-item {
+            background: rgba(15, 52, 96, 0.6);
+            border: 1px solid rgba(1, 253, 199, 0.3);
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .element-item:hover {
+            background: rgba(15, 52, 96, 0.9);
+            border-color: #01fdc7;
+        }
+        .element-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .element-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+        .element-item.standard {
+            border-color: #fa0;
+            background: rgba(255, 170, 0, 0.1);
+        }
+        .info-block {
+            background: rgba(0, 100, 181, 0.2);
+            border-left: 4px solid #0064b5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border-left-color: #4caf50;
+        }
+        code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #fa0;
+            font-family: 'Courier New', monospace;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .comp-box {
+            background: rgba(15, 52, 96, 0.4);
+            border: 1px solid rgba(1, 253, 199, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .comp-box h4 {
+            color: #fa0;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .comparison, .element-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Custom Generator Selection</h1>
+
+        <div class="section">
+            <h2>📋 What's New</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; margin-bottom: 20px;">
+                Previously, you could only select from the <strong>standard generators</strong> defined for each group.
+                Now you can <strong>choose ANY element of the group</strong> as a generator to create completely custom Cayley graphs!
+            </p>
+            <ul class="feature-list">
+                <li><strong>Select Any Element:</strong> Every group element can now be used as a generator</li>
+                <li><strong>Custom Subgraphs:</strong> Create graphs using non-standard generating sets</li>
+                <li><strong>Standard Generators Highlighted:</strong> Original generators marked with orange border</li>
+                <li><strong>Default Behavior:</strong> Standard generators selected by default</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🎮 How It Works</h2>
+            <div class="demo-box">
+                <h3>Example: Group with 6 Elements</h3>
+                <p style="margin-bottom: 15px; color: #aaa;">
+                    Select any elements below to use as generators:
+                </p>
+                <div class="element-grid">
+                    <div class="element-item standard" onclick="toggleCheck(0)">
+                        <input type="checkbox" id="e0" checked onchange="updateDemo()">
+                        <label for="e0">Gen 0 (std)</label>
+                    </div>
+                    <div class="element-item standard" onclick="toggleCheck(1)">
+                        <input type="checkbox" id="e1" checked onchange="updateDemo()">
+                        <label for="e1">Gen 1 (std)</label>
+                    </div>
+                    <div class="element-item" onclick="toggleCheck(2)">
+                        <input type="checkbox" id="e2" onchange="updateDemo()">
+                        <label for="e2">Element 2</label>
+                    </div>
+                    <div class="element-item" onclick="toggleCheck(3)">
+                        <input type="checkbox" id="e3" onchange="updateDemo()">
+                        <label for="e3">Element 3</label>
+                    </div>
+                    <div class="element-item" onclick="toggleCheck(4)">
+                        <input type="checkbox" id="e4" onchange="updateDemo()">
+                        <label for="e4">Element 4</label>
+                    </div>
+                    <div class="element-item" onclick="toggleCheck(5)">
+                        <input type="checkbox" id="e5" onchange="updateDemo()">
+                        <label for="e5">Element 5</label>
+                    </div>
+                </div>
+                <div class="info-block success" style="margin-top: 20px;">
+                    <strong>Selected:</strong> <span id="selected">Gen 0, Gen 1</span><br>
+                    <strong>Graph:</strong> <span id="result">Standard Cayley graph (default)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Comparison</h2>
+            <div class="comparison">
+                <div class="comp-box">
+                    <h4>Before: Standard Generators Only</h4>
+                    <div class="info-block">
+                        <p>✗ Limited to predefined generators</p>
+                        <p>✗ Only 2-3 generators available</p>
+                        <p>✗ Can't explore other generating sets</p>
+                    </div>
+                </div>
+                <div class="comp-box">
+                    <h4>After: Any Element as Generator</h4>
+                    <div class="info-block success">
+                        <p>✓ Choose from ALL group elements</p>
+                        <p>✓ Create custom generating sets</p>
+                        <p>✓ Explore different graph structures</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Technical Implementation</h2>
+            
+            <h3>New Methods (ts/Group.ts)</h3>
+            <div class="info-block">
+                <p><code>cayleyWithElements(generators: GroupElement[])</code></p>
+                <p style="margin-top: 10px;">
+                    Accepts an array of ANY GroupElement objects (not just indices) and generates
+                    the Cayley graph using those elements as generators.
+                </p>
+            </div>
+            <div class="info-block">
+                <p><code>getAllElements(): GroupElement[]</code></p>
+                <p style="margin-top: 10px;">
+                    Returns all elements of the group by first generating the complete Cayley graph
+                    with standard generators.
+                </p>
+            </div>
+
+            <h3>UI Changes (docs/index.html)</h3>
+            <div class="info-block">
+                <p>• <strong>Element Selection:</strong> Shows all group elements (not just standard generators)</p>
+                <p>• <strong>Smart Labeling:</strong> Standard generators labeled as "Gen X (std)", others as "Element X"</p>
+                <p>• <strong>Default Selection:</strong> Standard generators checked by default</p>
+                <p>• <strong>Dynamic Updates:</strong> Graph regenerates when you change selection</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 How to Use</h2>
+            <ol style="line-height: 2; font-size: 1.1em; padding-left: 20px;">
+                <li>Open the Cayley Graph Plotter and select a group</li>
+                <li>Open the <strong>"generatorSelection"</strong> folder in the UI controls</li>
+                <li>You'll see ALL group elements listed (standard generators marked with "(std)")</li>
+                <li>Check/uncheck any elements to use them as generators</li>
+                <li>The graph regenerates automatically with your custom generating set!</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2>💡 Example Use Cases</h2>
+            <ul class="feature-list">
+                <li><strong>Explore Subgroups:</strong> Use elements that generate a subgroup</li>
+                <li><strong>Compare Generating Sets:</strong> See how different generators create different graph structures</li>
+                <li><strong>Educational:</strong> Demonstrate that different generating sets can produce the same group</li>
+                <li><strong>Research:</strong> Investigate properties of specific generating sets</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleCheck(id) {
+            const checkbox = document.getElementById(`e${id}`);
+            checkbox.checked = !checkbox.checked;
+            updateDemo();
+        }
+
+        function updateDemo() {
+            const labels = [
+                'Gen 0 (std)', 'Gen 1 (std)', 'Element 2', 
+                'Element 3', 'Element 4', 'Element 5'
+            ];
+            
+            const selected = [];
+            for (let i = 0; i < 6; i++) {
+                if (document.getElementById(`e${i}`).checked) {
+                    selected.push(labels[i]);
+                }
+            }
+            
+            document.getElementById('selected').textContent = 
+                selected.length > 0 ? selected.join(', ') : 'None';
+            
+            let result = '';
+            if (selected.length === 0) {
+                result = 'No generators selected (only identity element)';
+            } else if (selected.length === 2 && selected.includes('Gen 0 (std)') && selected.includes('Gen 1 (std)')) {
+                result = 'Standard Cayley graph (default)';
+            } else if (selected.some(s => !s.includes('std'))) {
+                result = 'Custom Cayley graph using non-standard elements!';
+            } else {
+                result = 'Custom Cayley graph using subset of standard generators';
+            }
+            
+            document.getElementById('result').textContent = result;
+        }
+    </script>
+</body>
+</html>

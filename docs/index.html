@@ -106,8 +106,11 @@ function plot_group(plt, G, selectedGens) {
 
   plt  
     .linkDirectionalArrowLength(d => {
-      const g = G.gens[d.group];
-      return g.mul(g) == G.id
+      const genIdx = d.group;
+      const g = allElements[genIdx];
+      if (!g) return 15;
+      const gSquared = g.mul(g);
+      return gSquared.mat.equal(G.id.mat)
         ? 0
         : 15
     })
@@ -237,7 +240,8 @@ function ui_init(group_listing, matrep) {
     while (linkForce.__controllers.length > 0)
       linkForce.__controllers[0].remove();
 
-    new Array(G.gens.length).fill(true)
+    // Initialize params for all elements, but only select standard generators by default
+    new Array(allElements.length).fill(false)
       .forEach((v, idx) => {
         UIPARAMS[`genSelect #${idx}`] = v;
         UIPARAMS[`linkVisibility #${idx}`] = v;
@@ -246,8 +250,17 @@ function ui_init(group_listing, matrep) {
       });
     UIPARAMS[`arrowPos`] = 0.5;
 
-    new Array(G.gens.length).fill(1).forEach(
+    // Add controls for all elements
+    new Array(allElements.length).fill(1).forEach(
       (_, idx) => {
+        const element = allElements[idx];
+        const isStdGen = idx < G.gens.length;
+        const label = isStdGen ? `Gen ${idx} (std)` : `Element ${idx}`;
+
+        genSelect
+          .add(UIPARAMS, `genSelect #${idx}`)
+          .name(label)
+          .onChange(regeneratePlot);
 
         genSelect
           .add(UIPARAMS, `genSelect #${idx}`)
@@ -268,8 +281,9 @@ function ui_init(group_listing, matrep) {
           })
           .setValue(30);
 
-        const g = G.gens[idx];
-        if (g.mul(g) != G.id) {
+        const g = element;
+        const gSquared = g.mul(g);
+        if (!gSquared.mat.equal(G.id.mat)) {
           linkArrows
             .add(UIPARAMS, `linkArrows #${idx}`, 0, 30, 0.01)
             .onChange(() =>

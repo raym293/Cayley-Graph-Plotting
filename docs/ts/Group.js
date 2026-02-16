@@ -47,6 +47,11 @@ export class Group {
         }
         return graph;
     }
+    // Get all elements by generating the full cayley graph first
+    getAllElements() {
+        const cayley = this.cayley;
+        return cayley.map(([element]) => element);
+    }
 }
 export class GroupElement {
     constructor(grp, mat) {
