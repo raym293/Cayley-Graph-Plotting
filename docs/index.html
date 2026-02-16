@@ -315,7 +315,10 @@ function ui_init(group_listing, matrep) {
       }
     );
     linkArrows.add(UIPARAMS, `arrowPos`, 0, 1, 0.01)
-      .onChange(() => plt.linkDirectionalArrowRelPos(UIPARAMS[`arrowPos`]))
+      .onChange(() => plt.linkDirectionalArrowRelPos(UIPARAMS[`arrowPos`]));
+    
+    // Regenerate plot to reflect all selected elements
+    regeneratePlot();
   }
 
   const create_group_listing = () => {
